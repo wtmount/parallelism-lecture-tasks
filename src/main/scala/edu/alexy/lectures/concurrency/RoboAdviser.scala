@@ -7,23 +7,23 @@ import scala.concurrent.Future
 
 object RoboAdviser {
   // Task 1.
-  // Return 'AAPL' revenue. Possible error should be returned as a ServiceError.
+  // Return 'AAPL' revenue from `Db.getCompanyLastFinancials`. Possible error should be returned as a ServiceError.
   def getAAPLRevenue: Future[Double] = ???
 
   // Task 2.
-  // Implement a fallback strategy.
+  // Implement a fallback strategy for 'Db.getAllTickers'.
   // 'Db.getAllTickers' should be called no more then 'retries' times.
   // Possible error should be returned as a ServiceError.
   def getAllTickersRetryable(retries: Int = 10): Future[Seq[String]] = ???
 
   // Task 3.
-  // Implement a fallback strategy.
+  // Implement a fallback strategy for 'Db.getCompanyLastFinancials'.
   // 'Db.getCompanyLastFinancials' should be called no more then 'retries' times.
   // Possible error should be returned as a ServiceError.
   def getCompanyRetryable(ticker: String, retries: Int = 10): Future[Option[Company]] = ???
 
   // Task 4.
-  // Implement a fallback strategy.
+  // Implement a fallback strategy 'WebApi.getPrice'.
   // 'WebApi.getPrice' should be called no more then 'retries' times.
   // Possible error should be returned as a ServiceError.
   def getPriceRetryable(ticker: String, retries: Int = 10): Future[Double] = ???
@@ -43,7 +43,7 @@ object RoboAdviser {
   def buyList: Future[Seq[(Company, Double)]] = ???
 
   // Task 8.
-  // Implement a function that returns a list of expensive ('Company.isCheap') companies
+  // Implement a function that returns a list of expensive ('Company.isExpensive') companies
   // with their real time stock prices using 'getAllTickersRetryable', 'getCompanyRetryable',
   // 'getPriceRetryable' and zipping.
   def sellList: Future[Seq[(Company, Double)]] = ???
