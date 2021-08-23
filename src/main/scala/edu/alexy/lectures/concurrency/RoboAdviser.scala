@@ -11,9 +11,9 @@ object RoboAdviser {
   // Task 1.
   // Return 'AAPL' revenue from `Db.getCompanyLastFinancials`. Possible error should be returned as a ServiceError.
   def getAAPLRevenue: Future[Double] = {
-    Db.getCompanyLastFinancials("AAPL").map {
-      case Some(c) => c.revenue
-      case None => throw DbError
+    Db.getCompanyLastFinancials("AAPL").transform {
+      case Success(Some(company)) => Success(company.revenue)
+      case _ => Failure(DbError)
     }
   }
 
@@ -78,7 +78,7 @@ object RoboAdviser {
       companyPrice <- Future.traverse(tickers) {
         ticker => getCompanyFinancialsWithPrice(ticker)
       }
-    } yield companyPrice.filter(cp => cp._1.isCheap(cp._2))
+    } yield companyPrice.filter { case (company, price) => company.isCheap(price) }
   }
 
   // Task 8.
@@ -88,14 +88,10 @@ object RoboAdviser {
   def sellList: Future[Seq[(Company, Double)]] = {
     for {
       tickers <- getAllTickersRetryable()
-      companies <- Future.traverse(tickers) {
-        ticker => getCompanyRetryable(ticker)
+      companyPrice <- Future.traverse(tickers) {
+        ticker => getCompanyRetryable(ticker) zip getPriceRetryable(ticker)
       }
-      prices <- Future.traverse(tickers) {
-        ticker => getPriceRetryable(ticker)
-      }
-    } yield (companies zip prices).map(cp => cp._1 match {
-      case Some(company) => (company, cp._2)
-    }).filter(x => x._1.isExpensive(x._2))
+    } yield companyPrice.filter { case (Some(company), price) => company.isExpensive(price) }
+        .map(cp => (cp._1.get, cp._2))
   }
 }
