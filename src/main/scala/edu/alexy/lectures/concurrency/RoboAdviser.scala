@@ -91,7 +91,9 @@ object RoboAdviser {
       companyPrice <- Future.traverse(tickers) {
         ticker => getCompanyRetryable(ticker) zip getPriceRetryable(ticker)
       }
-    } yield companyPrice.filter { case (Some(company), price) => company.isExpensive(price) }
-        .map(cp => (cp._1.get, cp._2))
+    } yield companyPrice.filter {
+        case (Some(company), price) => company.isExpensive(price)
+        case _ => false
+    }.map(cp => (cp._1.get, cp._2))
   }
 }
